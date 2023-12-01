@@ -4,7 +4,6 @@ import os
 import random
 import re
 import warnings
-from typing import Union, Any
 from constants import MODEL_ABBR_MAP
 import numpy as np
 import torch

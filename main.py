@@ -1,6 +1,5 @@
 import os
 import re
-from typing import Any
 from huggingface_hub import hf_hub_download
 from constants import HUGGINGFACE_REPO_ID, LOGGER, BACKENDS_SUPPORTED_EXT, MODEL_CONFIGS
 import cv2
@@ -115,7 +114,7 @@ class PoseModel:
         self.config = config
         self.dataset = dataset
 
-    def __call__(self, im: np.ndarray) -> Any:
+    def __call__(self, im: np.ndarray) -> np.ndarray:
         B = im.shape[0]
         return np.random.randn(B, *self.dataset.keypoints_shape) \
             .astype(np.float32)
@@ -229,7 +228,7 @@ class ViTPoseAutoBackend:
             f"Data config: {data_config}\n" \
             f"Dataset: {self.dataset}\n"
 
-    def __call__(self, img: np.ndarray, bboxes: np.ndarray, stream: bool = False, **kwds: Any) -> Any:
+    def __call__(self, img: np.ndarray, bboxes: np.ndarray, stream: bool = False, **kwds) -> list:
         kargs = {**self.data_config, **kwds}
         image_size = kargs["image_size"] if "image_size" in kargs \
             else self.data_config["image_size"]

@@ -65,7 +65,7 @@ class Plotter:
     def __init__(self, dataset: PoseDataset) -> None:
         self.dataset = dataset
 
-    def plot(self, img, bboxes: np.ndarray | list = None, keypoints: np.ndarray | list = None, **kwds: Any) -> Any:
+    def plot(self, img, bboxes: np.ndarray | list = None, keypoints: np.ndarray | list = None, **kwds) -> np.ndarray:
 
         show_bbox = kwds.get("show_bbox", True)
         show_keypoints = kwds.get("show_keypoints", True)
