@@ -1,4 +1,4 @@
-from typing import Tuple, Optional
+from typing import Tuple, Dict, Optional
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,7 +25,7 @@ class PoseDataset:
         self.joints = None
         self.reverse_mapping = None
     
-    def load(self, path: str) -> Self:
+    def load(self, path: str):
         import yaml
         with open(path, "r") as f:
             data = yaml.safe_load(f)
@@ -46,7 +46,6 @@ class PoseDataset:
         self.reverse_mapping = {}
         for idx, name in self.keypoints.items():
             self.reverse_mapping[name] = idx
-        
         
         return self
     
