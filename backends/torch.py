@@ -87,10 +87,7 @@ class TorchBackend(Backend):
         input_names = ["input_0"]
         output_names = ["output_0"]
         B, C, H, W = self.get_input_shape()
-        inputs = torch.randn(B, C, H, W)
-
-
-
+        inputs = torch.randn(B, C, H, W).to(self.device)
         torch.onnx.export(
             self.model,
             inputs,
