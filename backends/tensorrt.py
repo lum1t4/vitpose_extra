@@ -24,7 +24,7 @@ class HostDeviceMem:
 
 
 class TensorRTBackend:
-    def __init__(self, half: bool = False):
+    def __init__(self, half: bool = False, device: str = torch.device("cuda:0")):
         import tensorrt as trt
         # Enable tensorrt lazy loading
         os.environ["CUDA_MODULE_LOADING"] = "LAZY"
@@ -39,12 +39,11 @@ class TensorRTBackend:
         self.dynamic        = None
         self.batch_size     = None
         self.half = half
+        self.device = device
 
     
     def load(self, model_path: str, **kargs):
-        import tensorrt as trt
-        device = torch.device('cuda:0')
-        
+        import tensorrt as trt        
         with open(model_path, 'rb') as f:
             engine = self.runtime.deserialize_cuda_engine(f.read())
 
@@ -65,7 +64,7 @@ class TensorRTBackend:
             else:  # output
                 output_names.append(name)
             shape = tuple(context.get_binding_shape(i))
-            im = torch.from_numpy(np.empty(shape, dtype=dtype)).to(device)
+            im = torch.from_numpy(np.empty(shape, dtype=dtype)).to(self.device)
             bindings[name] = Binding(name, dtype, shape, im, int(im.data_ptr()))
         binding_addrs = OrderedDict((n, d.ptr) for n, d in bindings.items()) 
         # if dynamic, this is instead max batch size
@@ -83,6 +82,7 @@ class TensorRTBackend:
     
 
     def __call__(self, im):
+        im = torch.from_numpy(im).to(self.device)
         if self.dynamic and im.shape != self.bindings['input_0'].shape:
             i = self.engine.get_binding_index('input_0')
             self.context.set_binding_shape(i, im.shape)  # reshape if dynamic
