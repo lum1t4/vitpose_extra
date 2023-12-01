@@ -105,35 +105,30 @@ class TorchBackend(Backend):
         half: bool = False,
         dynamic: bool = True,
         workspace: int =4,
-        verbose: bool = False
+        verbose: bool = False,
+        **kargs
     ):  
+        B, C, H, W = self.get_input_shape()
+        inputs = torch.randn(B, C, H, W).to(self.device)
         import tempfile
         with tempfile.NamedTemporaryFile(suffix='.onnx') as f:
-            self.export_onnx(f.name, verbose=verbose)
+            self.export_onnx(f.name, verbose=verbose, **kargs)
             f.seek(0)
-            _export_engine(
-                f.name,
-                output_path,
-                half=half,
-                dynamic=dynamic,
-                workspace=workspace,
-                verbose=verbose
-            )
+            export_engine(f.name, inputs, output_path, half=half,
+                          dynamic=dynamic, workspace=workspace, verbose=verbose)
 
 
-
-def _export_engine(
-    onnx_path: str,
-    output_path,
+def export_engine(
+    onnx: str,
+    im: torch.tensor,
+    file: str,
     half: bool = False,
     dynamic: bool = True,
     workspace: int =4,
     verbose: bool = False,
-    prefix='Tensorrt'
+    prefix='Tensorrt',
 ):  
-    
     import tensorrt as trt
-
     logger = trt.Logger(trt.Logger.INFO)
     if verbose:
         logger.min_severity = trt.Logger.Severity.VERBOSE
@@ -145,9 +140,8 @@ def _export_engine(
     flag = (1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
     network = builder.create_network(flag)
     parser = trt.OnnxParser(network, logger)
-
-    if not parser.parse_from_file(onnx_path):
-        raise RuntimeError(f'Failed to parse ONNX file: {onnx_path}')
+    if not parser.parse_from_file(str(onnx)):
+        raise RuntimeError(f'failed to load ONNX file: {onnx}')
 
     inputs = [network.get_input(i) for i in range(network.num_inputs)]
     outputs = [network.get_output(i) for i in range(network.num_outputs)]
@@ -157,27 +151,16 @@ def _export_engine(
         print(f'{prefix} output "{out.name}" with shape{out.shape} {out.dtype}')
 
     if dynamic:
-        if inputs.shape[0] <= 1:
-            print(f'{prefix} WARNING ⚠️ --dynamic model requires ' \
-                    'maximum --batch-size argument')
+        if im.shape[0] <= 1:
+            print(f'{prefix} WARNING ⚠️ --dynamic model requires maximum --batch-size argument')
         profile = builder.create_optimization_profile()
         for inp in inputs:
-            profile.set_shape(
-                inp.name,
-                (1, *inputs.shape[1:]),
-                (max(1, inputs.shape[0] // 2), *inputs.shape[1:]),
-                inputs.shape
-            )
+            profile.set_shape(inp.name, (1, *im.shape[1:]), (max(1, im.shape[0] // 2), *im.shape[1:]), im.shape)
         config.add_optimization_profile(profile)
 
-    f16_export = builder.platform_has_fast_fp16 and half
-        
-    print(f'{prefix} building FP{16 if f16_export else 32} engine')
-    if f16_export:
+    print(f'{prefix} building FP{16 if builder.platform_has_fast_fp16 and half else 32} engine')
+    if builder.platform_has_fast_fp16 and half:
         config.set_flag(trt.BuilderFlag.FP16)
-        # config.set_flag(trt.BuilderFlag.STRICT_TYPES)
-
-    with builder.build_engine(network, config) as engine, \
-        open(output_path, 'wb') as t:
+    with builder.build_engine(network, config) as engine, open(file, 'wb') as t:
         t.write(engine.serialize())
     return True

@@ -17,12 +17,6 @@ except ModuleNotFoundError as err:
     pass
 
 
-class InferenceEnginge(Enum):
-    pytorch = 0
-    coreml = 1
-    onnx = 2
-    tensorrt = 3
-
 
 class HostDeviceMem:
     """Simple helper data class that's a little nicer to use than a 2-tuple."""

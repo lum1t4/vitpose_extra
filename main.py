@@ -61,7 +61,7 @@ def get_default_path(dataset, size, backend):
         path = hf_hub_download(HUGGINGFACE_REPO_ID, remote_path)
     elif backend == "coreml":
         path = os.path.join(CACHE_DIR, f"ViTPose-{size}-{dataset}.mlpackage")
-    elif backend == "tensorrt":
+    elif backend == "engine":
         path = os.path.join(CACHE_DIR, f"ViTPose-{size}-{dataset}.trt")
     else:
         raise ValueError(f"Backend {backend} not supported.")

@@ -19,7 +19,7 @@ BACKENDS_SUPPORTED_EXT = {
     "coreml": ["mlmodel", "mlpackage"],
     "onnx": ["onnx"],
     "tensorflow": ["tflite", "pb", "pbtxt"],
-    "tensorrt": ["trt", "engine", "plan"],
+    "engine": ["trt", "engine", "plan"],
     "keras": ["h5", "hdf5"],
     "uff": ["uff"]
 }
