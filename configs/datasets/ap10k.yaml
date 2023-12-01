@@ -1,0 +1,17 @@
+data_config:
+  num_output_channels: 17
+  dataset_joints: 17
+  dataset_channel:
+    - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+  inference_channel:
+    - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+
+model_small: &head_config
+  keypoint_head:
+    out_channels: 17
+
+model_base: *head_config
+
+model_large: *head_config
+
+model_huge: *head_config

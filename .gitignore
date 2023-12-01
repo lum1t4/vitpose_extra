@@ -1,0 +1,21 @@
+# Mac OS specific files
+.DS_Store
+
+# Python cache and derived artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyz
+*.pyw
+*.pyi
+*.pyproj
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
