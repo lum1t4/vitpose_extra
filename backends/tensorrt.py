@@ -96,8 +96,8 @@ class TensorRTBackend:
                 )
         
         s = self.bindings['images'].shape
-        assert im.shape == s, f"input size {im.shape} {'>' \
-            if self.dynamic else 'not equal to'} max model size {s}"
+        assert im.shape == s, f"input size {im.shape} " \
+            f"{'>' if self.dynamic else '!='} max model size {s}"
         
         self.binding_addrs['images'] = int(im.data_ptr())
         self.context.execute_v2(list(self.binding_addrs.values()))
