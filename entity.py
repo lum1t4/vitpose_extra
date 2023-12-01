@@ -1,4 +1,4 @@
-from typing import Tuple, List, Dict, Any, Optional, Self
+from typing import Tuple, Optional
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
