@@ -108,7 +108,7 @@ class TensorRTBackend:
             heatmaps.reshape(1, -1, im.shape[2] // 4, im.shape[3] // 4) 
             for heatmaps in outputs
         ]
-        return results[0] if len(results) == 1 else results
+        return results[0].detach().cpu().numpy() if len(results) == 1 else results
 
 
 class OldTensorRT:
