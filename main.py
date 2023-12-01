@@ -171,7 +171,7 @@ def load_backend(backend, path, config):
         pass
         # from .backends.onnx import ONNXBackend
         # return ONNXBackend().load(path)
-    elif backend == "tensorrt":
+    elif backend == "engine":
         from backends.tensorrt import TensorRTBackend
         return TensorRTBackend().load(path)
     elif backend == "coreml":
