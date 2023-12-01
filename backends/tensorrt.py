@@ -69,7 +69,7 @@ class TensorRTBackend:
             bindings[name] = Binding(name, dtype, shape, im, int(im.data_ptr()))
         binding_addrs = OrderedDict((n, d.ptr) for n, d in bindings.items()) 
         # if dynamic, this is instead max batch size
-        batch_size = bindings['images'].shape[0]
+        batch_size = bindings['input_0'].shape[0] if 'input_0' in bindings else 1
 
         self.engine         = engine
         self.context        = context
@@ -83,10 +83,10 @@ class TensorRTBackend:
     
 
     def __call__(self, im):
-        if self.dynamic and im.shape != self.bindings['images'].shape:
-            i = self.engine.get_binding_index('images')
+        if self.dynamic and im.shape != self.bindings['input_0'].shape:
+            i = self.engine.get_binding_index('input_0')
             self.context.set_binding_shape(i, im.shape)  # reshape if dynamic
-            self.bindings['images'] = self.bindings['images'] \
+            self.bindings['input_0'] = self.bindings['input_0'] \
                 ._replace(shape=im.shape)
             
             for name in self.output_names:
@@ -95,11 +95,11 @@ class TensorRTBackend:
                     tuple(self.context.get_binding_shape(i))
                 )
         
-        s = self.bindings['images'].shape
+        s = self.bindings['input_0'].shape
         assert im.shape == s, f"input size {im.shape} " \
             f"{'>' if self.dynamic else '!='} max model size {s}"
         
-        self.binding_addrs['images'] = int(im.data_ptr())
+        self.binding_addrs['input_0'] = int(im.data_ptr())
         self.context.execute_v2(list(self.binding_addrs.values()))
         
         return [self.bindings[x].data for x in sorted(self.output_names)]
