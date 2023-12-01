@@ -1,2 +1,2 @@
-from main import ViTPoseAutoBackend
-from entity import Plotter
+from .main import ViTPoseAutoBackend
+from .entity import Plotter
