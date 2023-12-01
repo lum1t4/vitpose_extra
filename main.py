@@ -240,3 +240,6 @@ class ViTPoseAutoBackend:
         
         return [predict(self.model , img, bbox, image_size=image_size,
                         mean=mean, std=std) for bbox in bboxes]
+    
+    def get_dataset(self):
+        return self.dataset
