@@ -2,9 +2,6 @@
 import numpy as np
 import torch
 import os
-import json
-import pycuda.driver as cuda
-import coremltools as ct
 import numpy as np
 import torch
 
