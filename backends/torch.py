@@ -10,7 +10,8 @@ from io import BytesIO
 class TorchBackend(Backend):
     def __init__(self, config: dict):
         super().__init__()
-        self.model = ViTPose(config)
+        self.config = config
+        self.model = ViTPose(self.config)
         self.device = None
 
     def load(self, path: str, device: str | torch.device = None, **kargs):
@@ -71,7 +72,7 @@ class TorchBackend(Backend):
         coreml_model.save(path)
 
 
-    def torch_to_onnx(self, path: str | BytesIO, opset: int = 11, verbose: bool = False):
+    def export_onnx(self, path: str | BytesIO, opset: int = 11, verbose: bool = False):
         """
         Export model to ONNX format
         model (ViTPose): model to export
@@ -111,7 +112,7 @@ class TorchBackend(Backend):
     ):  
         import tempfile
         with tempfile.NamedTemporaryFile(suffix='.onnx') as f:
-            self.torch_to_onnx(self.model, f, verbose=verbose)
+            self.export_onnx(f.name, verbose=verbose)
             f.seek(0)
             _export_engine(
                 f.name,

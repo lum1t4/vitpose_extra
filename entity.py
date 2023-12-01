@@ -49,6 +49,9 @@ class PoseDataset:
         
         return self
     
+    def get_keypoints_names(self):
+        return list(self.keypoints.values())
+    
     def kpt_color(self, idx: int):
         return tuple(self.palette_joints[idx % len(self.palette_joints)])
     
