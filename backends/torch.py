@@ -54,7 +54,7 @@ class TorchBackend(Backend):
             f"File {path} is not a .mlmodel or .mlpackage file"
         import coremltools as ct
         
-        
+        B, C, H, W = self.get_input_shape()
         model = self.model
         model.eval()
         device = next(self.model.parameters()).device

@@ -6,18 +6,15 @@ class ONNXBackend(Backend):
     def __init__(self) -> None:
         super().__init__()
         self.providers = ort.get_available_providers()
+        # self.providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
         self.session = None
         self.input_name = None
-        # providers = ['CUDAExecutionProvider', 'CPUExecutionProvider']
         
     def load(self, path: str, **kargs):
         super().load(path, **kargs)
         assert path.endswith('.onnx'), \
             f"File {path} is not a .onnx file"
-        self.session = ort.InferenceSession(path, ort.InferenceSession(
-                path,
-                providers=self.providers
-        ))
+        self.session = ort.InferenceSession(path, providers=self.providers)
         self.input_name = self.session.get_inputs()[0].name
 
         return self
