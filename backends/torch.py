@@ -49,7 +49,7 @@ class TorchBackend(Backend):
         H, W = self.config["backbone"]["img_size"]
         return (1, 3, H, W)
     
-    def torch_to_coreml(self, path: str, **kargs):
+    def export_coreml(self, path: str, **kargs):
         path.endswith('.mlmodel') or path.endswith('.mlpackage'), \
             f"File {path} is not a .mlmodel or .mlpackage file"
         import coremltools as ct
@@ -57,11 +57,10 @@ class TorchBackend(Backend):
         B, C, H, W = self.get_input_shape()
         model = self.model
         model.eval()
-        device = next(self.model.parameters()).device
-        inputs = torch.randn(1, 3, H, W).to(device)
+        inputs = torch.randn(B, C, H, W)
         traced_model = torch.jit.trace(model, inputs)
         input_shape = ct.Shape(shape=
-            (ct.RangeDim(lower_bound=1, upper_bound=10, default=1), 3, H, W)
+            (ct.RangeDim(lower_bound=1, upper_bound=10, default=1), C, H, W)
         )
         coreml_model = ct.convert(
             traced_model,
