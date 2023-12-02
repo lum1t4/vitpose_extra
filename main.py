@@ -169,8 +169,8 @@ def load_backend(backend, path, config):
         return TorchBackend(config).load(path)
     elif backend == "onnx":
         pass
-        # from .backends.onnx import ONNXBackend
-        # return ONNXBackend().load(path)
+        from .backends.onnx import ONNXBackend
+        return ONNXBackend().load(path)
     elif backend == "engine":
         from backends.tensorrt import TensorRTBackend
         return TensorRTBackend().load(path)
